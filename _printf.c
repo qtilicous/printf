@@ -8,6 +8,49 @@ int print_char(va_list args);
 int print_string(va_list args);
 int print_number(va_list args);
 /**
+ * _printf - Custom printf function
+ * @format: Format string containing conversion specifiers
+ *
+ * Return: Number of characters printed
+ */
+int _printf(const char *format, ...)
+{
+	va_list args;
+	int count = 0;
+	const char *c;
+
+	va_start(args, format);
+	for (c = format; *c != '\0'; c++)
+	{
+		if (*c != '%')
+		{
+			count += _putchar(*c);
+		}
+		else
+		{
+			c++;
+			if (*c == 'c')
+				count += print_char(args);
+			else if (*c == 's')
+				count += print_string(args);
+			else if (*c == '%')
+				count += _putchar('%');
+			else if (*c == 'd' || *c == 'i')
+				count += print_number(args);
+			else
+			{
+				_putchar('%');
+				_putchar(*c);
+				count += 2;
+			}
+		}
+	}
+	va_end(args);
+
+	return (count);
+}
+
+/**
  * _putchar - Writes a character to stdout
  * @c: The character to write
  *
@@ -81,49 +124,6 @@ int print_number(va_list args)
 		temp %= digits;
 		digits /= 10;
 	}
-
-	return (count);
-}
-
-/**
- * _printf - Custom printf function
- * @format: Format string containing conversion specifiers
- *
- * Return: Number of characters printed
- */
-int _printf(const char *format, ...)
-{
-	va_list args;
-	int count = 0;
-	const char *c;
-
-	va_start(args, format);
-	for (c = format; *c != '\0'; c++)
-	{
-		if (*c != '%')
-		{
-			count += _putchar(*c);
-		}
-		else
-		{
-			c++;
-			if (*c == 'c')
-				count += print_char(args);
-			else if (*c == 's')
-				count += print_string(args);
-			else if (*c == '%')
-				count += _putchar('%');
-			else if (*c == 'd' || *c == 'i')
-				count += print_number(args);
-			else
-			{
-				_putchar('%');
-				_putchar(*c);
-				count += 2;
-			}
-		}
-	}
-	va_end(args);
 
 	return (count);
 }
