@@ -1,67 +1,119 @@
+#include <unistd.h>
 #include "main.h"
 
-void print_buffer(char buffer[], int *buff_ind);
-
 /**
- * _printf - Printf function
- * @format: format.
- * Return: Printed chars.
+ * _putchar - Writes a character to stdout
+ * @c: The character to write
+ *
+ * Return: 1 (success), -1 (failure)
  */
-int _printf(const char *format, ...)
+int _putchar(char c)
 {
-	int i, printed = 0, printed_chars = 0;
-	int flags, width, precision, size, buff_ind = 0;
-	va_list list;
-	char buffer[BUFF_SIZE];
-
-	if (format == NULL)
-		return (-1);
-
-	va_start(list, format);
-
-	for (i = 0; format && format[i] != '\0'; i++)
-	{
-		if (format[i] != '%')
-		{
-			buffer[buff_ind++] = format[i];
-			if (buff_ind == BUFF_SIZE)
-				print_buffer(buffer, &buff_ind);
-			/* write(1, &format[i], 1);*/
-			printed_chars++;
-		}
-		else
-		{
-			print_buffer(buffer, &buff_ind);
-			flags = get_flags(format, &i);
-			width = get_width(format, &i, list);
-			precision = get_precision(format, &i, list);
-			size = get_size(format, &i);
-			++i;
-			printed = handle_print(format, &i, list, buffer,
-				flags, width, precision, size);
-			if (printed == -1)
-				return (-1);
-			printed_chars += printed;
-		}
-	}
-
-	print_buffer(buffer, &buff_ind);
-
-	va_end(list);
-
-	return (printed_chars);
+	return (write(1, &c, 1));
 }
 
 /**
- * print_buffer - Prints the contents of the buffer if it exist
- * @buffer: Array of chars
- * @buff_ind: Index at which to add next char, represents the length.
+ * print_char - Handles 'c' conversion specifier
+ * @args: va_list containing the arguments
+ *
+ * Return: Number of characters printed
  */
-void print_buffer(char buffer[], int *buff_ind)
+int print_char(va_list args)
 {
-	if (*buff_ind > 0)
-		write(1, &buffer[0], *buff_ind);
+	return (_putchar(va_arg(args, int)));
+}
 
-	*buff_ind = 0;
+/**
+ * print_string - Handles 's' conversion specifier
+ * @args: va_list containing the arguments
+ *
+ * Return: Number of characters printed
+ */
+int print_string(va_list args)
+{
+	char *str = va_arg(args, char *);
+	int count = 0;
+
+	while (*str)
+	{
+		count += _putchar(*str);
+		str++;
+	}
+	return (count);
+}
+
+/**
+ * print_number - Handles 'd' and 'i' conversion specifiers
+ * @args: va_list containing the arguments
+ *
+ * Return: Number of characters printed
+ */
+int print_number(va_list args)
+{
+	int num = va_arg(args, int);
+	int temp, digits = 0;
+	int count = 0;
+
+	if (num < 0)
+	{
+		count += _putchar('-');
+		num = -num;
+	}
+
+	temp = num;
+
+	do {
+		temp /= 10;
+		digits++;
+	} while (temp != 0);
+
+	temp = num;
+	while (digits > 0)
+	{
+		char digit = (temp / digits) + '0';
+
+		count += _putchar(digit);
+		temp %= digits;
+		digits /= 10;
+	}
+
+	return (count);
+}
+
+/**
+ * _printf - Custom printf function
+ * @format: Format string containing conversion specifiers
+ *
+ * Return: Number of characters printed
+ */
+int _printf(const char *format, ...)
+{
+	va_list args;
+	int count = 0;
+	const char *c;
+
+	va_start(args, format);
+	for (c = format; *c != '\0'; c++)
+	{
+		if (*c != '%')
+		{
+			count += _putchar(*c);
+		}
+		else
+		{
+			c++;
+			if (*c == 'c')
+				count += print_char(args);
+			else if (*c == 's')
+				count += print_string(args);
+			else if (*c == '%')
+				count += _putchar('%');
+			else if (*c == 'd' || *c == 'i')
+				count += print_number(args);
+		}
+	}
+	va_end(args);
+
+	return (count);
 }
 
