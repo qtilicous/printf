@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <unistd.h>
 #include "main.h"
 
@@ -51,7 +52,8 @@ int print_string(va_list args)
 int print_number(va_list args)
 {
 	int num = va_arg(args, int);
-	int temp, digits = 0;
+	int temp = num;
+	int digits = 0;
 	int count = 0;
 
 	if (num < 0)
@@ -59,8 +61,6 @@ int print_number(va_list args)
 		count += _putchar('-');
 		num = -num;
 	}
-
-	temp = num;
 
 	do {
 		temp /= 10;
@@ -110,6 +110,11 @@ int _printf(const char *format, ...)
 				count += _putchar('%');
 			else if (*c == 'd' || *c == 'i')
 				count += print_number(args);
+			else
+			{
+				count += _putchar('%');
+				count += _putchar(*c);
+			}
 		}
 	}
 	va_end(args);
