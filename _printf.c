@@ -2,6 +2,11 @@
 #include <unistd.h>
 #include "main.h"
 
+int _putchar(char c);
+
+int print_char(va_list args);
+int print_string(va_list args);
+int print_number(va_list args);
 /**
  * _putchar - Writes a character to stdout
  * @c: The character to write
@@ -112,8 +117,9 @@ int _printf(const char *format, ...)
 				count += print_number(args);
 			else
 			{
-				count += _putchar('%');
-				count += _putchar(*c);
+				_putchar('%');
+				_putchar(*c);
+				count += 2;
 			}
 		}
 	}
